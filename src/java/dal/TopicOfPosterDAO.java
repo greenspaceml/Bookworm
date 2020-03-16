@@ -5,10 +5,10 @@
  */
 package dal;
 
+import context.DBContext;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.sql.ResultSet;
 
 /**
  *
@@ -16,31 +16,47 @@ import java.util.logging.Logger;
  */
 public class TopicOfPosterDAO extends DBContext {
 
-    public boolean UploadToTopicofPoster(String postID, String topicID) {
+    public boolean UploadToTopicofPoster(String postID, String topicID) throws Exception {
         int check = 0;
+                Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " insert into TopicOfPoster(PostID,TopicID) values\n"
                     + " (?,?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, postID);
             ps.setString(2, topicID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(TopicOfPosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
 
-    public boolean deleteTopicOfPosterByPosterID(String postID) {
+    public boolean deleteTopicOfPosterByPosterID(String postID) throws Exception {
         int check = 0;
+                Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "   delete from TopicOfPoster\n"
                     + "   where PostID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, postID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(TopicOfPosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }

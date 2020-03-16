@@ -7,6 +7,8 @@ package controller.entities;
 
 import dal.ReportDAO;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,13 +21,17 @@ public class DeleteReportController extends BaseRequiredAuthenticationController
 
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String rid = request.getParameter("rid");
-        ReportDAO reportDAO = new ReportDAO();
-        boolean check = reportDAO.deleteReportByReportID(rid);
-        if (check) {
-            response.sendRedirect("admin");
-        }else{
-            
+        try {
+            String rid = request.getParameter("rid");
+            ReportDAO reportDAO = new ReportDAO();
+            boolean check = reportDAO.deleteReportByReportID(rid);
+            if (check) {
+                response.sendRedirect("admin");
+            }else{
+                
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(DeleteReportController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

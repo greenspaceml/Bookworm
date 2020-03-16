@@ -8,6 +8,8 @@ package controller.entities;
 import dal.CommentDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -32,7 +34,11 @@ public class UploadCommentController extends BaseRequiredAuthenticationControlle
         String text = request.getParameter("textComment").trim();
         String postID = request.getParameter("postID");
         if (!text.isEmpty()) {
-            check = commentDAO.uploadComment(user.getID(), postID, text);
+            try {
+                check = commentDAO.uploadComment(user.getID(), postID, text);
+            } catch (Exception ex) {
+                Logger.getLogger(UploadCommentController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         } else {
             check = false;
         }

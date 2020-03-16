@@ -5,10 +5,12 @@
  */
 package controller.entities;
 
-import dal.DBContext;
+import context.DBContext;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
@@ -23,6 +25,7 @@ import until.SessionHelper;
  * @author sonnt
  */
 public abstract class BaseRequiredAuthenticationController extends HttpServlet {
+
     User u;
 
     private boolean isAuthenticated(HttpServletRequest request) {
@@ -48,15 +51,19 @@ public abstract class BaseRequiredAuthenticationController extends HttpServlet {
                     }
                 }
                 if (username != null && password != null) {
-                    UserDAO userDAO = new UserDAO();
-                    u = new User();
-                    u = userDAO.getUserByUsernameAndPassword(username, password);
-                    user = userDAO.getUserByUsernameAndPassword(username, password);
-                    if (user != null) {
-                        SessionHelper.addUserToSession(request.getSession(), user);
-                        return true;
-                    } else {
-                        return false;
+                    try {
+                        UserDAO userDAO = new UserDAO();
+                        u = new User();
+                        u = userDAO.getUserByUsernameAndPassword(username, password);
+                        user = userDAO.getUserByUsernameAndPassword(username, password);
+                        if (user != null) {
+                            SessionHelper.addUserToSession(request.getSession(), user);
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    } catch (Exception ex) {
+                        Logger.getLogger(BaseRequiredAuthenticationController.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
             }

@@ -11,6 +11,8 @@ import dal.ReportDAO;
 import dal.TopicOfPosterDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -24,41 +26,45 @@ public class DeletePostController extends BaseRequiredAuthenticationController {
 
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        boolean checkComment = false;
-        boolean checkTOP = false;
-        boolean checkPoster = false;
-        boolean checkReport = false;
-        CommentDAO commentDAO = new CommentDAO();
-        PosterDAO posterDAO = new PosterDAO();
-        TopicOfPosterDAO topicOfPosterDAO = new TopicOfPosterDAO();
-        ReportDAO reportDAO = new ReportDAO();
-        String posterID = request.getParameter("poid");
-        if (commentDAO.getCommentCountByPostID(posterID) != 0) {
-            checkComment = commentDAO.deleteCommentByPostID(posterID);
-        }else{
-            checkComment = true;
-        }
-        if (reportDAO.getReportCountByPostID(posterID) != 0) {
-            checkReport = reportDAO.deleteReportByPostID(posterID);
-        }else{
-            checkReport = true;
-        }
-        checkTOP = topicOfPosterDAO.deleteTopicOfPosterByPosterID(posterID);
-        checkPoster = posterDAO.deletePostByPostID(posterID);
-        if (checkComment && checkTOP && checkPoster && checkReport) {
-            response.sendRedirect("list");
-        } else {
-            try (PrintWriter out = response.getWriter()) {
-                out.println("<!DOCTYPE html>");
-                out.println("<html>");
-                out.println("<head>");
-                out.println("<title>Update</title>");
-                out.println("</head>");
-                out.println("<body>");
-                out.println("<h1>" + "Delete falsed !" + "</h1>");
-                out.println("</body>");
-                out.println("</html>");
+        try {
+            boolean checkComment = false;
+            boolean checkTOP = false;
+            boolean checkPoster = false;
+            boolean checkReport = false;
+            CommentDAO commentDAO = new CommentDAO();
+            PosterDAO posterDAO = new PosterDAO();
+            TopicOfPosterDAO topicOfPosterDAO = new TopicOfPosterDAO();
+            ReportDAO reportDAO = new ReportDAO();
+            String posterID = request.getParameter("poid");
+            if (commentDAO.getCommentCountByPostID(posterID) != 0) {
+                checkComment = commentDAO.deleteCommentByPostID(posterID);
+            }else{
+                checkComment = true;
             }
+            if (reportDAO.getReportCountByPostID(posterID) != 0) {
+                checkReport = reportDAO.deleteReportByPostID(posterID);
+            }else{
+                checkReport = true;
+            }
+            checkTOP = topicOfPosterDAO.deleteTopicOfPosterByPosterID(posterID);
+            checkPoster = posterDAO.deletePostByPostID(posterID);
+            if (checkComment && checkTOP && checkPoster && checkReport) {
+                response.sendRedirect("list");
+            } else {
+                try (PrintWriter out = response.getWriter()) {
+                    out.println("<!DOCTYPE html>");
+                    out.println("<html>");
+                    out.println("<head>");
+                    out.println("<title>Update</title>");
+                    out.println("</head>");
+                    out.println("<body>");
+                    out.println("<h1>" + "Delete falsed !" + "</h1>");
+                    out.println("</body>");
+                    out.println("</html>");
+                }
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(DeletePostController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

@@ -8,6 +8,8 @@ package controller.entities;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,24 +38,28 @@ public class ChangePasswordController extends BaseRequiredAuthenticationControll
         UserDAO userDAO = new UserDAO();
         if (oldPassword.equals(user.getPassword())) {
             if (newPassword1.equals(newPassword2)) {
-                check = userDAO.changeUserpassword(newPassword1, user.getID());
-                if (check) {
+                try {
+                    check = userDAO.changeUserpassword(newPassword1, user.getID());
+                    if (check) {
 
-                    out.println("                    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@8'></script>");
-                    out.println("<script src='https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.11.4/sweetalert2.all.js'></script>");
-                    out.println("<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>");
-                    out.println("<script>");
-                    out.println("$(document).ready(function(){");
-                    out.println("Swal.fire({");
-                    out.println("  position: 'top-end',");
-                    out.println(" type: 'success',");
-                    out.println(" title: 'Password changed successful',");
-                    out.println("showConfirmButton: false,");
-                    out.println("timer: 1500");
-                    out.println("})");
-                    out.println("});");
-                    out.println("</script>");
-                    request.getRequestDispatcher("changePassword.jsp").include(request, response);
+                        out.println("                    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@8'></script>");
+                        out.println("<script src='https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.11.4/sweetalert2.all.js'></script>");
+                        out.println("<script src='https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js'></script>");
+                        out.println("<script>");
+                        out.println("$(document).ready(function(){");
+                        out.println("Swal.fire({");
+                        out.println("  position: 'top-end',");
+                        out.println(" type: 'success',");
+                        out.println(" title: 'Password changed successful',");
+                        out.println("showConfirmButton: false,");
+                        out.println("timer: 1500");
+                        out.println("})");
+                        out.println("});");
+                        out.println("</script>");
+                        request.getRequestDispatcher("changePassword.jsp").include(request, response);
+                    }
+                } catch (Exception ex) {
+                    Logger.getLogger(ChangePasswordController.class.getName()).log(Level.SEVERE, null, ex);
                 }
             } else {
                 out.println("<script src='https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/6.11.4/sweetalert2.all.js'></script>");

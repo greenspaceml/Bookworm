@@ -10,6 +10,8 @@ import dal.TopicOfPosterDAO;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -41,10 +43,14 @@ public class UploadPostController extends BaseRequiredAuthenticationController {
         String filephoto = request.getParameter("myFile");
         String[] listTopicID = request.getParameterValues("tid");
         if (!posterName.isEmpty() && !posterText.isEmpty() && !filephoto.isEmpty() && listTopicID.length != 0) {
-            checkPoster = posterDAO.UploadPost(newPosterID, posterName, user.getID(), filephoto, posterText);
-            for (int i = 0; i < listTopicID.length; i++) {
-                String temp = listTopicID[i];
-                checkTopic = topicOfPosterDAO.UploadToTopicofPoster(newPosterID, temp);
+            try {
+                checkPoster = posterDAO.UploadPost(newPosterID, posterName, user.getID(), filephoto, posterText);
+                for (int i = 0; i < listTopicID.length; i++) {
+                    String temp = listTopicID[i];
+                    checkTopic = topicOfPosterDAO.UploadToTopicofPoster(newPosterID, temp);
+                }
+            } catch (Exception ex) {
+                Logger.getLogger(UploadPostController.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
 

@@ -5,11 +5,10 @@
  */
 package dal;
 
+import context.DBContext;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import models.Photo;
 
 /**
@@ -18,49 +17,69 @@ import models.Photo;
  */
 public class PhotoDAO extends DBContext {
 
-    public Photo getPhotoByUserID(String id) {
+    public Photo getPhotoByUserID(String id) throws Exception {
         Photo p = new Photo();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "SELECT UserPhoto.PhotoID, Photo.PhotoName, Photo.Title \n"
                     + " FROM Photo INNER JOIN\n"
                     + " UserPhoto ON Photo.ID = UserPhoto.PhotoID INNER JOIN\n"
                     + " [User] ON [User].ID = UserPhoto.UserID\n"
                     + " where [User].ID = ?";
+            connection = dBContext.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
             statement.setString(1, id);
-            ResultSet rs = statement.executeQuery();
+            rs = statement.executeQuery();
             while (rs.next()) {
                 p.setID(rs.getString("PhotoID"));
                 p.setPhotoname(rs.getString("PhotoName"));
                 p.setTittle(rs.getString("Title"));
             }
 
-        } catch (SQLException ex) {
-            Logger.getLogger(PhotoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return p;
     }
 
-    public boolean editUserPhotoByUserID(String photoName, String userID) {
+    public boolean editUserPhotoByUserID(String photoName, String userID) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "  Update Photo\n"
                     + "  Set PhotoName = ?\n"
                     + "  From Photo p inner join UserPhoto up\n"
                     + "  On p.ID = up.PhotoID\n"
                     + "  WHERE up.UserID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, photoName);
             ps.setString(2, userID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(PhotoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
 
-    public boolean editUserPhotoTitleByUserID(String photoTitle, String userID) {
+    public boolean editUserPhotoTitleByUserID(String photoTitle, String userID) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "  Update Photo\n"
                     + "  Set"
@@ -68,42 +87,63 @@ public class PhotoDAO extends DBContext {
                     + "  From Photo p inner join UserPhoto up\n"
                     + "  On p.ID = up.PhotoID\n"
                     + "  WHERE up.UserID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, photoTitle);
             ps.setString(2, userID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(PhotoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
 
-    public boolean insertUsertoPhoto(String photoID,String photoName, String photoTitle) {
+    public boolean insertUsertoPhoto(String photoID, String photoName, String photoTitle) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " insert into Photo (ID,PhotoName,Title) values\n"
                     + " (?,?,?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, photoID);
             ps.setString(2, photoName);
             ps.setString(3, photoTitle);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(PhotoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
-        public boolean insertUsertoUserPhoto(String userID, String photoID) {
+
+    public boolean insertUsertoUserPhoto(String userID, String photoID) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " insert into UserPhoto (UserID,PhotoID) values\n"
                     + " (?,?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, userID);
             ps.setString(2, photoID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(PhotoDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }

@@ -8,6 +8,8 @@ package controller.entities;
 import dal.TopicDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +24,15 @@ public class ListPostsByTopicController extends BaseRequiredAuthenticationContro
 
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        TopicDAO topicDAO = new TopicDAO();
-        String tid = request.getParameter("tid");
-        Topic topic = topicDAO.getTopicbyTopicID(tid);
-        request.setAttribute("topic", topic);
-        request.getRequestDispatcher("listPostsByTopic.jsp").forward(request, response);
+        try {
+            TopicDAO topicDAO = new TopicDAO();
+            String tid = request.getParameter("tid");
+            Topic topic = topicDAO.getTopicbyTopicID(tid);
+            request.setAttribute("topic", topic);
+            request.getRequestDispatcher("listPostsByTopic.jsp").forward(request, response);
+        } catch (Exception ex) {
+            Logger.getLogger(ListPostsByTopicController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

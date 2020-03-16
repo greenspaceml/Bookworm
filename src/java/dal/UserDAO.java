@@ -5,6 +5,8 @@
  */
 package dal;
 
+import context.DBContext;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,8 +22,12 @@ import processSupporter.ProcessSupport;
  */
 public class UserDAO extends DBContext {
 
-    public ArrayList<User> Users() {
+    public ArrayList<User> Users() throws Exception {
         ArrayList<User> listUsers = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         String sql = "SELECT ID\n"
                 + "      ,AccountType\n"
                 + "      ,Username\n"
@@ -31,8 +37,9 @@ public class UserDAO extends DBContext {
                 + "      ,Hobbies\n"
                 + "  FROM \"User\"";
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 User d = new User();
                 d.setID(rs.getString("ID"));
@@ -44,13 +51,16 @@ public class UserDAO extends DBContext {
                 d.setAccountType(rs.getBoolean("AccountType"));
                 listUsers.add(d);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listUsers;
     }
 
-    public User getUserByUsernameAndPassword(String username, String password) {
+    public User getUserByUsernameAndPassword(String username, String password) throws Exception {
         for (User u : Users()) {
             if (username.equals(u.getUsername()) && password.equals(u.getPassword())) {
                 return u;
@@ -59,17 +69,21 @@ public class UserDAO extends DBContext {
         return null;
     }
 
-    public User getUserByPostID(String postID) {
-
+    public User getUserByPostID(String postID) throws Exception {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         User d = new User();
         try {
             String sql = "  Select u.ID,u.Username,u.Password,u.DisplayName,u.DateOfbirth,u.Hobbies,u.AccountType\n"
                     + " FROM Poster p inner join [User] u\n"
                     + " ON p.UserID = u.ID\n"
                     + " where p.ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, postID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
 
                 d.setID(rs.getString("ID"));
@@ -80,23 +94,30 @@ public class UserDAO extends DBContext {
                 d.setHobbies(rs.getString("Hobbies"));
                 d.setAccountType(rs.getBoolean("AccountType"));
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return d;
     }
 
-    public User getUserByCommentID(String commentID) {
-
+    public User getUserByCommentID(String commentID) throws Exception {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         User d = new User();
         try {
             String sql = "  Select u.ID,u.Username,u.Password,u.DisplayName,u.DateOfbirth,u.Hobbies,u.AccountType\n"
                     + " FROM Comment c inner join [User] u\n"
                     + " ON c.UserID = u.ID\n"
                     + " where c.ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, commentID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
 
                 d.setID(rs.getString("ID"));
@@ -107,22 +128,29 @@ public class UserDAO extends DBContext {
                 d.setHobbies(rs.getString("Hobbies"));
                 d.setAccountType(rs.getBoolean("AccountType"));
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return d;
     }
 
-    public User getUserByUserID(String userID) {
-
+    public User getUserByUserID(String userID) throws Exception {
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         User d = new User();
         try {
             String sql = "  Select u.ID,u.Username,u.Password,u.DisplayName,u.DateOfbirth,u.Hobbies,u.AccountType\n"
                     + " FROM [User] u\n"
                     + " where u.ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, userID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
 
                 d.setID(rs.getString("ID"));
@@ -133,40 +161,56 @@ public class UserDAO extends DBContext {
                 d.setHobbies(rs.getString("Hobbies"));
                 d.setAccountType(rs.getBoolean("AccountType"));
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return d;
     }
 
-    public boolean editProfileByuserID(String userID, String displayName, String dateOfBirth, String hobbies) {
+    public boolean editProfileByuserID(String userID, String displayName, String dateOfBirth, String hobbies) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "  Update [User]\n"
                     + "  Set DisplayName = ?,\n"
                     + "	DateOfbirth = ?,\n"
                     + "	Hobbies = ?\n"
                     + "  WHERE ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, displayName);
             ps.setString(2, dateOfBirth);
             ps.setString(3, hobbies);
             ps.setString(4, userID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
 
-    public boolean createNewAccount(String userID, String displayName, String DOB, String hobbies, String username, String password) {
+    public boolean createNewAccount(String userID, String displayName, String DOB, String hobbies, String username, String password) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "  insert into [User] (ID, AccountType, Username,\n"
                     + "			[Password], DisplayName,\n"
                     + "			DateOfbirth, Hobbies) values\n"
                     + " (?,?,?,?,?,?,?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, userID);
             ps.setString(2, "0");
             ps.setString(3, username);
@@ -175,24 +219,35 @@ public class UserDAO extends DBContext {
             ps.setString(6, DOB);
             ps.setString(7, hobbies);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
 
-    public boolean changeUserpassword(String password, String userID) {
+    public boolean changeUserpassword(String password, String userID) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " update [User]\n"
                     + " set [Password] = ?\n"
                     + " where ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, password);
             ps.setString(2, userID);
             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(UserDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }

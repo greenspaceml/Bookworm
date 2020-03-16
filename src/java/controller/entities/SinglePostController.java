@@ -9,6 +9,8 @@ import dal.PosterDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,11 +25,15 @@ public class SinglePostController extends BaseRequiredAuthenticationController {
 
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        PosterDAO posterDAO = new PosterDAO();
-        String pid = String.valueOf(request.getParameter("poid"));
-        Poster posters = posterDAO.getPosterByID(pid);
-        request.setAttribute("posters", posters);
-        request.getRequestDispatcher("singlePost.jsp").forward(request, response);
+        try {
+            PosterDAO posterDAO = new PosterDAO();
+            String pid = String.valueOf(request.getParameter("poid"));
+            Poster posters = posterDAO.getPosterByID(pid);
+            request.setAttribute("posters", posters);
+            request.getRequestDispatcher("singlePost.jsp").forward(request, response);
+        } catch (Exception ex) {
+            Logger.getLogger(SinglePostController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

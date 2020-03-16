@@ -10,6 +10,8 @@ import dal.ReportDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -31,16 +33,20 @@ public class AdminController extends BaseRequiredAuthenticationController {
 
         User user = sessionHelper.getUserFromSession(request.getSession());
         if (user.isAccountType()) {
-            ReportDAO reportDAO = new ReportDAO();
-            ArrayList<Report> listReport = reportDAO.getReports();
-            String rid = request.getParameter("rid");
-            if (rid == null || rid.isEmpty()) {
-                rid = reportDAO.getFirstReportID();
+            try {
+                ReportDAO reportDAO = new ReportDAO();
+                ArrayList<Report> listReport = reportDAO.getReports();
+                String rid = request.getParameter("rid");
+                if (rid == null || rid.isEmpty()) {
+                    rid = reportDAO.getFirstReportID();
+                }
+                Report instanceReport = reportDAO.getReportByReportID(rid);
+                request.setAttribute("listReport", listReport);
+                request.setAttribute("instanceReport", instanceReport);
+                request.getRequestDispatcher("admin.jsp").forward(request, response);
+            } catch (Exception ex) {
+                Logger.getLogger(AdminController.class.getName()).log(Level.SEVERE, null, ex);
             }
-            Report instanceReport = reportDAO.getReportByReportID(rid);
-            request.setAttribute("listReport", listReport);
-            request.setAttribute("instanceReport", instanceReport);
-            request.getRequestDispatcher("admin.jsp").forward(request, response);
         } else {
             SessionHelper.addUserToSession(request.getSession(), null);
             CookieHelper.removeCookie(response, "username");

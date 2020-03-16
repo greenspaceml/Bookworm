@@ -8,6 +8,8 @@ package controller.entities;
 import dal.ReportDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -29,23 +31,27 @@ public class ReportController extends BaseRequiredAuthenticationController {
 
     @Override
     protected void processPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        request.setCharacterEncoding("UTF-8");
-        response.setCharacterEncoding("UTF-8");
-        SessionHelper sessionHelper = new SessionHelper();
-        ProcessSupport processSupport = new ProcessSupport();
-        User user = sessionHelper.getUserFromSession(request.getSession());
-        String posterID = request.getParameter("poid");
-        String ReportName = request.getParameter("ReportName");
-        String ReportText = request.getParameter("ReportText");
-        String ID = "r" + processSupport.getCurrentDateForCommentID();
-        String dateOfReport = processSupport.getCurrentDate();
-        ReportDAO reportDAO = new ReportDAO();
-        boolean check = reportDAO.reportToAdmin(ID, user.getID(), posterID, ReportName, ReportText, dateOfReport);
-        if (check) {
-            response.sendRedirect("list");
-        } else {
-
+        try {
+            response.setContentType("text/html;charset=UTF-8");
+            request.setCharacterEncoding("UTF-8");
+            response.setCharacterEncoding("UTF-8");
+            SessionHelper sessionHelper = new SessionHelper();
+            ProcessSupport processSupport = new ProcessSupport();
+            User user = sessionHelper.getUserFromSession(request.getSession());
+            String posterID = request.getParameter("poid");
+            String ReportName = request.getParameter("ReportName");
+            String ReportText = request.getParameter("ReportText");
+            String ID = "r" + processSupport.getCurrentDateForCommentID();
+            String dateOfReport = processSupport.getCurrentDate();
+            ReportDAO reportDAO = new ReportDAO();
+            boolean check = reportDAO.reportToAdmin(ID, user.getID(), posterID, ReportName, ReportText, dateOfReport);
+            if (check) {
+                response.sendRedirect("list");
+            } else {
+                
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(ReportController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

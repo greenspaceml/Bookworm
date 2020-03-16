@@ -5,6 +5,8 @@
  */
 package dal;
 
+import context.DBContext;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -20,12 +22,17 @@ import processSupporter.ProcessSupport;
  */
 public class PosterDAO extends DBContext {
 
-    public ArrayList<Poster> getPostersByRecent() {
+    public ArrayList<Poster> getPostersByRecent() throws Exception {
         ArrayList<Poster> listPosters = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         String sql = " Select * from Poster order by PostingDate desc";
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();
                 p.setID(rs.getString("ID"));
@@ -39,14 +46,21 @@ public class PosterDAO extends DBContext {
                 listPosters.add(p);
 
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listPosters;
     }
 
-    public ArrayList<Poster> getIDPostersByHighlight() {
+    public ArrayList<Poster> getIDPostersByHighlight() throws Exception {
         ArrayList<Poster> listPosters = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         String sql = " SELECT p.ID\n"
                 + " FROM Poster p inner join Comment c \n"
                 + " ON p.ID = c.PostID inner join [User] u\n"
@@ -54,29 +68,38 @@ public class PosterDAO extends DBContext {
                 + " GROUP BY p.ID\n"
                 + " Order by Count(c.ID) desc";
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
-            ResultSet rs = ps.executeQuery();
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();
                 p.setID(rs.getString("ID"));
                 listPosters.add(p);
 
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listPosters;
     }
 
-    public Poster getPosterByID(String postID) {
+    public Poster getPosterByID(String postID) throws Exception {
         Poster p = new Poster();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " SELECT *\n"
                     + " FROM Poster p\n"
                     + " WHERE p.ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, postID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 p.setID(rs.getString("ID"));
                 p.setPostName(rs.getString("PostName"));
@@ -87,23 +110,31 @@ public class PosterDAO extends DBContext {
                 p.setText(rs.getString("Text"));
                 p.setPostingDate(rs.getDate("PostingDate"));
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return p;
     }
 
-    public ArrayList<Poster> getPostersbyUserID(String userID) {
+    public ArrayList<Poster> getPostersbyUserID(String userID) throws Exception {
         ArrayList<Poster> listPosters = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         String sql = " SELECT p.ID, p.Image, p.PostingDate, p.PostName, p.Text, p.UserID\n"
                 + " FROM [User] u inner join Poster p \n"
                 + " ON u.ID = p.UserID\n"
                 + " where u.ID = ?\n"
                 + " ORDER BY p.PostingDate desc";
         try {
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, userID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 while (rs.next()) {
                     Poster p = new Poster();
@@ -118,34 +149,50 @@ public class PosterDAO extends DBContext {
                     listPosters.add(p);
                 }
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listPosters;
     }
 
-    public int countPorts() {
+    public int countPorts() throws Exception {
         int count = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " Select count(p.ID) as N from Poster p ";
-            PreparedStatement ps = connection.prepareCall(sql);
-            ResultSet rs = ps.executeQuery();
+            connection = dBContext.getConnection();
+            ps = connection.prepareCall(sql);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 count = rs.getInt("N");
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return count;
     }
 
-    public boolean UploadPost(String posterID, String PostName, String userID, String photoName, String text) {
+    public boolean UploadPost(String posterID, String PostName, String userID, String photoName, String text) throws Exception {
         int check = 0;
         ProcessSupport support = new ProcessSupport();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = " insert into Poster (ID,PostName,UserID,Image,Text,PostingDate) values\n"
                     + " (?,?,?,?,?,?)";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, posterID); //DONE
             ps.setString(2, PostName); // get
             ps.setString(3, userID); // get 
@@ -154,23 +201,30 @@ public class PosterDAO extends DBContext {
             ps.setString(6, support.getCurrentDate()); //DONE
             check = ps.executeUpdate();
 
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }
 
-    public ArrayList<Poster> getPosterByTopicID(String topicID) {
+    public ArrayList<Poster> getPosterByTopicID(String topicID) throws Exception {
         ArrayList<Poster> listposters = new ArrayList<>();
-
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "  SELECT p.ID, p.Image, p.PostingDate, p.PostName, p.Text, p.UserID\n"
                     + "  FROM Poster p inner join TopicOfPoster tp\n"
                     + "  ON p.ID = tp.PostID\n"
                     + "  WHERE tp.TopicID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, topicID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();
                 p.setID(rs.getString("ID"));
@@ -183,22 +237,30 @@ public class PosterDAO extends DBContext {
                 p.setPostingDate(rs.getDate("PostingDate"));
                 listposters.add(p);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listposters;
     }
 
-    public Poster getPosterByCommentID(String commentID) {
+    public Poster getPosterByCommentID(String commentID) throws Exception {
         Poster p = new Poster();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "  SELECT p.ID, p.Image, p.PostingDate, p.PostName, p.Text, p.UserID \n"
                     + "  FROM Comment c inner join Poster p\n"
                     + "  ON c.PostID = p.ID\n"
                     + "  where c.ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, commentID);
-            ResultSet rs = ps.executeQuery();
+            rs = ps.executeQuery();
             while (rs.next()) {
                 p.setID(rs.getString("ID"));
                 p.setPostName(rs.getString("PostName"));
@@ -209,21 +271,29 @@ public class PosterDAO extends DBContext {
                 p.setText(rs.getString("Text"));
                 p.setPostingDate(rs.getDate("PostingDate"));
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return p;
     }
 
-    public ArrayList<Poster> searchByPosterName(String containsName) {
+    public ArrayList<Poster> searchByPosterName(String containsName) throws Exception {
         ArrayList<Poster> listposter = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "   SELECT *\n"
                     + "   FROM Poster p\n"
-                    + "   WHERE p.PostName LIKE "+"'% "+containsName+"%'"; 
-            PreparedStatement ps = connection.prepareStatement(sql);
-            //ps.setString(1, "'%"+containsName+"%'");
-            ResultSet rs = ps.executeQuery();
+                    + "   WHERE p.PostName LIKE " + "'% " + "?" + "%'";
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, containsName);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();
                 p.setID(rs.getString("ID"));
@@ -236,21 +306,29 @@ public class PosterDAO extends DBContext {
                 p.setPostingDate(rs.getDate("PostingDate"));
                 listposter.add(p);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listposter;
     }
 
-    public ArrayList<Poster> searchByPosterScript(String containsText) {
+    public ArrayList<Poster> searchByPosterScript(String containsText) throws Exception {
         ArrayList<Poster> listposter = new ArrayList<>();
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "      SELECT *\n"
                     + "   FROM Poster p\n"
-                    + "   WHERE p.Text LIKE "+"'%"+containsText+"%'";
-            PreparedStatement ps = connection.prepareStatement(sql);
-            //ps.setString(1, containsText);
-            ResultSet rs = ps.executeQuery();
+                    + "   WHERE p.Text LIKE " + "'%" + "?" + "%'";
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
+            ps.setString(1, containsText);
+            rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();
                 p.setID(rs.getString("ID"));
@@ -263,22 +341,33 @@ public class PosterDAO extends DBContext {
                 p.setPostingDate(rs.getDate("PostingDate"));
                 listposter.add(p);
             }
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return listposter;
     }
 
-    public boolean deletePostByPostID(String postID) {
+    public boolean deletePostByPostID(String postID) throws Exception {
         int check = 0;
+        Connection connection = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        DBContext dBContext = new DBContext();
         try {
             String sql = "   Delete from Poster \n"
                     + "   where ID = ?";
-            PreparedStatement ps = connection.prepareStatement(sql);
+            connection = dBContext.getConnection();
+            ps = connection.prepareStatement(sql);
             ps.setString(1, postID);
-             check = ps.executeUpdate();
-        } catch (SQLException ex) {
-            Logger.getLogger(PosterDAO.class.getName()).log(Level.SEVERE, null, ex);
+            check = ps.executeUpdate();
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            //close all connection
+            dBContext.closeAll(connection, ps, rs);
         }
         return check > 0;
     }

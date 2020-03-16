@@ -9,6 +9,8 @@ import dal.CommentDAO;
 import dal.PosterDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -23,13 +25,17 @@ public class DeleteCommentController extends BaseRequiredAuthenticationControlle
 
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        CommentDAO commentDAO = new CommentDAO();        
-        String commentID = request.getParameter("cid");
-        PosterDAO posterDAO = new PosterDAO();
-        Poster poster = posterDAO.getPosterByCommentID(commentID);
-        boolean check = commentDAO.deleteCommentByCommentID(commentID);
-        if (check) {
-            response.sendRedirect("singlePost?poid=" + poster.getID());
+        try {
+            CommentDAO commentDAO = new CommentDAO();
+            String commentID = request.getParameter("cid");
+            PosterDAO posterDAO = new PosterDAO();
+            Poster poster = posterDAO.getPosterByCommentID(commentID);
+            boolean check = commentDAO.deleteCommentByCommentID(commentID);
+            if (check) {
+                response.sendRedirect("singlePost?poid=" + poster.getID());
+            }
+        } catch (Exception ex) {
+            Logger.getLogger(DeleteCommentController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

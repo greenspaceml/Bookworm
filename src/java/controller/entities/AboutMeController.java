@@ -8,6 +8,8 @@ package controller.entities;
 import dal.UserDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,11 +24,15 @@ public class AboutMeController extends BaseRequiredAuthenticationController {
 
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        UserDAO userDAO = new UserDAO();
-        String uid = String.valueOf(request.getParameter("uid"));
-        User user = userDAO.getUserByUserID(uid);
-        request.setAttribute("user", user);
-        request.getRequestDispatcher("aboutMe.jsp").forward(request, response);
+        try {
+            UserDAO userDAO = new UserDAO();
+            String uid = String.valueOf(request.getParameter("uid"));
+            User user = userDAO.getUserByUserID(uid);
+            request.setAttribute("user", user);
+            request.getRequestDispatcher("aboutMe.jsp").forward(request, response);
+        } catch (Exception ex) {
+            Logger.getLogger(AboutMeController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Override

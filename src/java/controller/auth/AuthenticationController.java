@@ -7,6 +7,8 @@ package controller.auth;
 
 import dal.UserDAO;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -30,28 +32,34 @@ public class AuthenticationController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
-        String remember = request.getParameter("remember");
-        UserDAO userDAO = new UserDAO();
 
-        User user = userDAO.getUserByUsernameAndPassword(username, password);
+        try {
+            String username = request.getParameter("username");
+            String password = request.getParameter("password");
+            String remember = request.getParameter("remember");
+            UserDAO userDAO = new UserDAO();
 
-        if (user != null) {
-            SessionHelper.addUserToSession(request.getSession(), user);
-            if (remember != null) {
-                CookieHelper.sendCookie(response, "username", user.getUsername());
-                CookieHelper.sendCookie(response, "password", user.getPassword());
-            }
-            if (user.isAccountType()) {
-                response.sendRedirect("admin");
+            User user = null;
+
+            user = userDAO.getUserByUsernameAndPassword(username, password);
+
+            if (user != null) {
+                SessionHelper.addUserToSession(request.getSession(), user);
+                if (remember != null) {
+                    CookieHelper.sendCookie(response, "username", user.getUsername());
+                    CookieHelper.sendCookie(response, "password", user.getPassword());
+                }
+                if (user.isAccountType()) {
+                    response.sendRedirect("admin");
+                } else {
+                    response.sendRedirect("list");
+                }
+
             } else {
-                response.sendRedirect("list");
+                response.sendRedirect("login");
             }
-
-        } else {
-            response.sendRedirect("login");
+        } catch (Exception ex) {
+            Logger.getLogger(AuthenticationController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
