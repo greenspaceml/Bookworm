@@ -29,6 +29,7 @@
             String searchedText = (String) request.getAttribute("searchText");
             User userInstance = SessionHelper.getUserFromSession(session);
             ArrayList<Poster> listPosterNameSearched = posterDAO.searchByPosterName(searchedText);
+            System.out.println("-----------------------------------------------"+listPosterNameSearched.size());
             Photo userPhotoInstance = photoDAO.getPhotoByUserID(userInstance.getID());
             ArrayList<String> listTopicID = topicDAO.getListTopicIDByDESC();
         %>

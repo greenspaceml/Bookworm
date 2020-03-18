@@ -289,10 +289,10 @@ public class PosterDAO extends DBContext {
         try {
             String sql = "   SELECT *\n"
                     + "   FROM Poster p\n"
-                    + "   WHERE p.PostName LIKE " + "'% " + "?" + "%'";
+                    + "   WHERE p.PostName LIKE " + "'%" + containsName + "%'";
             connection = dBContext.getConnection();
             ps = connection.prepareStatement(sql);
-            ps.setString(1, containsName);
+            //ps.setString(1, containsName);
             rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();
@@ -324,10 +324,10 @@ public class PosterDAO extends DBContext {
         try {
             String sql = "      SELECT *\n"
                     + "   FROM Poster p\n"
-                    + "   WHERE p.Text LIKE " + "'%" + "?" + "%'";
+                    + "   WHERE p.Text LIKE " + "'%" + containsText + "%'";
             connection = dBContext.getConnection();
             ps = connection.prepareStatement(sql);
-            ps.setString(1, containsText);
+            //ps.setString(1, containsText);
             rs = ps.executeQuery();
             while (rs.next()) {
                 Poster p = new Poster();

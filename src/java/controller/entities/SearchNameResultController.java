@@ -26,7 +26,6 @@ public class SearchNameResultController extends BaseRequiredAuthenticationContro
     @Override
     protected void processGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String searchText = request.getParameter("searchText");
-        PosterDAO posterDAO = new PosterDAO();
         request.setAttribute("searchText", searchText);
         request.getRequestDispatcher("searchNameResult.jsp").forward(request, response);
     }
